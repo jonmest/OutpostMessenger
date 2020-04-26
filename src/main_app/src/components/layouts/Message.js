@@ -1,20 +1,22 @@
 import React, { Fragment } from 'react'
 
 const Message = props => {
-    const message = props.message
+    const plaintext = props.plaintext
+    const sender = props.sender
     const contact = props.contact
 
+    console.log(sender)
     return (
         <Fragment>                   
             <div className="columns">
             <div className="column">
             {
-                (message.sender === contact.id ) ?
+                (sender === contact.id ) ?
                 <Fragment>
                 <span className="help has-text-grey-light">{contact.id}</span>
                 <article className="message is-dark">
                 <div className="message-body">
-                { message.message.plain }
+                { plaintext }
                 </div>
                 </article>
                 </Fragment> :
@@ -23,14 +25,14 @@ const Message = props => {
             </div>
             <div className="column">
             {
-                (message.sender !== contact.id ) ?
+                (sender !== contact.id ) ?
                 <Fragment>
                     <span className="help has-text-grey-light">
                         You
                     </span>
                     <article className="message ">
                         <div className="message-body">
-                            { message.message.message.plain }
+                            { plaintext }
                         </div>
                     </article>
                 </Fragment> :

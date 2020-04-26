@@ -13,7 +13,17 @@ module.exports = {
                 $outpostId: outpostId
             }, (error, success) => {
                 if (error) console.log(error)
-                else resolve(success)
+                else {
+                    db.run(
+                        `
+                        DELETE FROM contact_requests
+                        WHERE recipientId = $outpostId;`,
+                        {
+                            $outpostId: outpostId
+                        }
+                    )
+                    resolve(success)
+                }
             }
             )
         })

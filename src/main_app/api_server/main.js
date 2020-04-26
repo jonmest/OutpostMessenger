@@ -3,7 +3,7 @@ const userDataPath = process.argv[3]
 console.log(process.argv)
 process.env.USER_DATA_PATH = userDataPath
 
-console.log("THE PATH IS")
+console.log("THE PATH IS:")
 console.log(userDataPath)
 
 if (port === undefined) {

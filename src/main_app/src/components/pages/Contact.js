@@ -1,9 +1,10 @@
 import React, { Fragment, useContext, useEffect, useState, useRef }   from 'react';
 import GlobalContext from '../../context/global/GlobalContext'
 import Message from '../layouts/Message'
-import { post } from '../../util/request'
+import { post, get } from '../../util/request'
 import io from 'socket.io-client'
 import socketAuth from '../../util/socketAuth'
+import MessageList from '../layouts/MessageList'
 
 const Contact = props => {
 
@@ -59,8 +60,15 @@ const Contact = props => {
 
     // Establish IO connection
     setupSocket('https://outpostmessenger.com/')
-    
-    setMessages(msgs => msgs.concat(previousMessages))
+
+    get(
+      `http://localhost:5000/outpost/messages?id=${props.match.params.contact}`,
+      globalContext.bearToken,
+    )
+    .then(res => res.messages)
+    .then(messages => {
+      setMessages(msgs => msgs.concat(messages))
+    })
 
     // eslint-disable-next-line
   }, [])
@@ -70,10 +78,23 @@ const Contact = props => {
       'http://localhost:5000/outpost/decrypt',
       globalContext.bearToken,
       { message }
-    )
-    .then(item => item.message)
+    ).then(item => item.message)
     
-    setMessages(msgs => msgs.concat(decrypted))
+    post(
+      'http://localhost:5000/outpost/messages',
+      globalContext.bearToken,
+      {
+        sender: decrypted.sender,
+        recipient: decrypted.recipient,
+        data: decrypted.message
+      }
+    )
+
+    setMessages(msgs => msgs.concat({
+        sender: decrypted.sender,
+        recipient: decrypted.recipient,
+        plaintext: decrypted.message.plain
+    }))
   }
 
   /*
@@ -89,6 +110,16 @@ const Contact = props => {
     event.preventDefault()
     if (message.length < 1) return
 
+    post(
+      'http://localhost:5000/outpost/messages',
+      globalContext.bearToken,
+      {
+        sender: contact.id,
+        recipient: globalContext.client.id,
+        data: message
+      }
+    )
+
     const schema = {
       message : {
             recipient : contact.id,
@@ -98,7 +129,6 @@ const Contact = props => {
             }
       }
     }
-    setMessages(msgs => msgs.concat(schema))
 
     // Reset input field
     setMessage('')
@@ -111,6 +141,13 @@ const Contact = props => {
       globalContext.bearToken,
       schema
     )
+
+
+    setMessages(msgs => msgs.concat({
+      sender: globalContext.client.id,
+      recipient: contact.id,
+      plaintext: message
+    }))
 
     /*
     * Send message to socket server
@@ -134,9 +171,9 @@ const Contact = props => {
                       height: '70vh',
                       overflowX: 'hidden', overflowY: 'scroll'
                     }}>
-          {
-          messages.map(item => <Message message={item} contact={contact}/>)
-          }
+          
+          <MessageList messages={messages} contact={contact}/>
+
           <div ref={messagesEndRef} />
           </div>
                     </div>

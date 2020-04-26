@@ -66,7 +66,6 @@ module.exports = {
           reply.send({
             result: 'failure'
           })
-          console.log(e)
         }
       },
 

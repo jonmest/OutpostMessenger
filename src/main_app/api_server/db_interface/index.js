@@ -172,7 +172,7 @@ const saveMessage = async (message, db) => {
         })
     })
 }
-const loadMessages = async (sender, db) => {
+const loadMessages = async (id, db) => {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
             db.all(`SELECT
@@ -181,9 +181,9 @@ const loadMessages = async (sender, db) => {
                     FROM 
                         messages
                     WHERE
-                        sender = (?) OR recipient = (?);
+                        sender = $id OR recipient = $id;
                     `,
-                    sender,
+                    { $id: id },
                     async (error, rows) => {
                         if (error) reject(error)
                         resolve(rows)

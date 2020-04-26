@@ -13,7 +13,6 @@ const encryptMessage_sync = (plainMessage, recipient, myClient) => {
     const nonce = nacl.randomBytes(nacl.box.nonceLength)
     const sender = myClient.id
 
-    console.log(plainMessage)
     let secret
     if (typeof plainMessage === 'string') {
         secret = nacl.box(

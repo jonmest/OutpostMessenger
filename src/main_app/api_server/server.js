@@ -14,7 +14,6 @@ module.exports = (port, callback) => {
   */
 
   const dbPath = `${process.env.USER_DATA_PATH}/outpost.db` 
-  console.log(dbPath)
   var sqlite3 = require('@journeyapps/sqlcipher').verbose()
   const db = new sqlite3.Database(dbPath)
   // ↓↓↓ Very important, routes won't work without this

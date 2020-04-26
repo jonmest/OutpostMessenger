@@ -1,2 +1,3 @@
 /node_modules/
 /main_app/node_modules/
+./test.db
