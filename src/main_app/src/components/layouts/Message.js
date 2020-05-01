@@ -1,11 +1,9 @@
 import React, { Fragment } from 'react'
+import Moment from 'react-moment'
 
-const Message = props => {
-    const plaintext = props.plaintext
-    const sender = props.sender
-    const contact = props.contact
-
-    console.log(sender)
+const Message = ({ data, sender, contact, timestamp, me }) => {
+    const time = new Date(timestamp)
+    
     return (
         <Fragment>                   
             <div className="columns">
@@ -13,10 +11,12 @@ const Message = props => {
             {
                 (sender === contact.id ) ?
                 <Fragment>
-                <span className="help has-text-grey-light">{contact.id}</span>
+                <span className="help has-text-grey-light">
+                    <Moment date={ time } format="YYYY-MM-DD HH:mm"/>
+                </span>
                 <article className="message is-dark">
                 <div className="message-body">
-                { plaintext }
+                { data }
                 </div>
                 </article>
                 </Fragment> :
@@ -25,16 +25,18 @@ const Message = props => {
             </div>
             <div className="column">
             {
-                (sender !== contact.id ) ?
+                (sender !== contact.id || me === contact.id ) ?
                 <Fragment>
                     <span className="help has-text-grey-light">
-                        You
+                        <Moment date={ time } format="YYYY-MM-DD HH:mm"/>
                     </span>
                     <article className="message ">
                         <div className="message-body">
-                            { plaintext }
+                            { data }
                         </div>
+
                     </article>
+
                 </Fragment> :
                 null
             }

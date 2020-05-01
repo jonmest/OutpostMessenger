@@ -37,7 +37,8 @@ const createClient = (client, db) => {
                 `CREATE TABLE messages (
                     sender TEXT,
                     recipient TEXT,
-                    data TEXT
+                    data TEXT,
+                    timestamp TEXT
                     );`
                 , (error, success) => {
                     if (error) reject('Already exists')
@@ -120,8 +121,10 @@ const loadContact = async (contactId, db) => {
                     contactId,
                     async (error, row) => {
                         if (error) reject(error)
-                        if (row === undefined || row === null) reject()
-                        
+                        if (row === undefined || row === null) {
+                            reject()
+                            return
+                        }
                         resolve({
                             id: row.id,
                             publicKey: row.publicKey
@@ -129,6 +132,7 @@ const loadContact = async (contactId, db) => {
             })
         })
     })
+    .catch(reason => console.log("F"))
 }
 
 const loadContacts = async (db) => {
@@ -143,6 +147,7 @@ const loadContacts = async (db) => {
                     `,
                     async (error, rows) => {
                         if (error) reject(error)
+                        console.log(rows)
                         resolve(rows)
             })
         })
@@ -152,6 +157,8 @@ const loadContacts = async (db) => {
 
 const saveMessage = async (message, db) => {
     return new Promise((resolve, reject) => {
+        console.log(`Saving message from ${message.sender}`)
+        console.log(message)
         db.serialize(() => {
             /**
              * Insert data into client table
@@ -159,14 +166,22 @@ const saveMessage = async (message, db) => {
             db.run(
                 `INSERT INTO messages (
                     sender,
-                    recipient.
-                    data
+                    recipient,
+                    data,
+                    timestamp
                 )
-                VALUES ($sender, $recipient, $data);`, {
+                VALUES (
+                    $sender,
+                    $recipient,
+                    $data,
+                    $timestamp
+                );`, {
                     $sender: message.sender,
                     $recipient: message.recipient,
-                    $data: message.data
-                }, () => {
+                    $data: message.data,
+                    $timestamp: message.timestamp
+                }, (error, success) => {
+                    if (error) console.log(error)
                     resolve()
                 })
         })
@@ -174,18 +189,19 @@ const saveMessage = async (message, db) => {
 }
 const loadMessages = async (id, db) => {
     return new Promise((resolve, reject) => {
+        console.log(`Loading messages from ${id}`)
         db.serialize(() => {
-            db.all(`SELECT
-                        sender,
-                        data
+            db.all(`SELECT *
                     FROM 
                         messages
                     WHERE
-                        sender = $id OR recipient = $id;
+                        recipient = $id OR sender = $id;
                     `,
                     { $id: id },
-                    async (error, rows) => {
-                        if (error) reject(error)
+                    (error, rows) => {
+                        console.log('This is what we found...')
+                        console.log(rows)
+                        if (error) console.log(error)
                         resolve(rows)
             })
         })
@@ -197,7 +213,9 @@ const loadAllMessages = async (db) => {
         db.serialize(() => {
             db.all(`SELECT
                         sender,
-                        data
+                        recipient,
+                        data,
+                        timestamp
                     FROM 
                         messages;
                     `,

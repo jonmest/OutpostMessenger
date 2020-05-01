@@ -5,20 +5,32 @@
  * @param {object} bodyObject 
  */
 const post = async (url, token, bodyObject) => {
-    return fetch(
-        url, 
+    const options = (token !== null) ?
+        {
+        method: 'POST',
+        mode: 'cors',
+        headers: new Headers({
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(bodyObject)
+        } :
         {
             method: 'POST',
             mode: 'cors',
             headers: new Headers({
-                'Authorization': token,
                 'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify(bodyObject)
-    })
+            }),
+            body: JSON.stringify(bodyObject)
+         }
+
+    return fetch(
+        url, 
+        options
+        )
     .then(res => res.json())
     .catch(error => {
-        throw new Error('Failed to post.')
+        console.log('Failed to post.')
     })
 }
 

@@ -88,8 +88,13 @@ const socketAuthentication = (socket, db, next) => {
     * the nonce to verify/encrypt it and their id
     */
     socket.on('Authentication response', async ({ signedToken, nonce, id }) => {
+        console.log('Someone wants to connect.')
+
         // This is whom they claim to be
         const supposedClient = await getOutpost(id, db)
+
+        console.log('Someone wants to connect.')
+        console.log(signedToken)
 
         // We'll try to decrypt the token they sent back
         const authenticatedToken = nacl.box.open(
@@ -98,6 +103,7 @@ const socketAuthentication = (socket, db, next) => {
             Buffer.from(supposedClient.publicKey, 'base64'),
             secretKey
         )
+
 
         /*
         * If authenticatedToken is NULL, we're
@@ -135,17 +141,15 @@ ioSocket.on('connection', socket => {
     socketAuthentication(socket, db, async (id, socketId) => {
         getContactRequests(id, db)
         .then(requests => {
-            console.log(requests)
             if (requests.length > 0) {
                 socket.emit('contactRequests', requests)
             }
         })
 
         socket.on('message', async message => {
-            const { recipient } = JSON.parse(JSON.parse(message).message)
+            console.log(message)
+            const { recipient } = message
             const connected = await getConnected(recipient, db)
-
-            console.log(connected)
 
             if (connected.length > 0) {
                 connected.forEach(item => {
@@ -153,7 +157,7 @@ ioSocket.on('connection', socket => {
                 })
             } else {
                 console.log("Nobody matched.")
-                saveMessage(recipient, message, db)
+                saveMessage(recipient, JSON.stringify(message), db)
             }
         })
 

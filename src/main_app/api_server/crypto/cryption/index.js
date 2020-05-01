@@ -9,42 +9,30 @@ const nacl = require('tweetnacl')
  * @param {Client} myClient
  * @returns
  */
-const encryptMessage_sync = (plainMessage, recipient, myClient) => {
+const encryptMessage_sync = (plainMessage, recipient, timestamp, myClient, isSignature) => {
     const nonce = nacl.randomBytes(nacl.box.nonceLength)
     const sender = myClient.id
-
-    let secret
-    if (typeof plainMessage === 'string') {
-        secret = nacl.box(
-            Buffer.from(plainMessage, 'base64'),
+    const plain = (isSignature) ? Buffer.from(plainMessage, 'base64') : Buffer.from(plainMessage)
+    
+    const secret = nacl.box(
+            plain,
             nonce,
             Buffer.from(recipient.publicKey, 'base64'),
             Buffer.from(myClient.privateKey, 'base64') 
         )
-    } else {
-        secret = nacl.box(
-            Buffer.from(
-                JSON.stringify({
-                message: plainMessage.message
-            }), 'utf-8'),
-            nonce,
-            Buffer.from(recipient.publicKey, 'base64'),
-            Buffer.from(myClient.privateKey, 'base64') 
-        )
-    }
-
 
     return JSON.stringify({
-        recipient: recipient.id,
+        recipient: recipient.id || recipient,
         sender,
+        timestamp,
         nonce: Buffer.from(nonce).toString('base64'),
         secret: Buffer.from(secret).toString('base64')
     })
 }
 
-const encryptMessage = (plainMessage, recipient, myClient) => {
+const encryptMessage = (plainMessage, recipient, timestamp, myClient, isSignature) => {
     return new Promise((resolve, reject) => {
-        resolve(encryptMessage_sync(plainMessage, recipient, myClient))
+        resolve(encryptMessage_sync(plainMessage, recipient, timestamp, myClient, isSignature))
         reject(() => {
             throw new Error()
         })
@@ -65,9 +53,10 @@ const decryptMessage_sync = (cipherMessageObject, sender, myClient) => {
     )
 
     return {
-        recipient: myClient.id,
         sender: sender.id,
-        message: JSON.parse(Buffer.from(decryptedSecret, 'base64').toString('utf-8')).message
+        recipient: myClient.id,
+        timestamp: cipherMessageObject.timestamp,
+        data: Buffer.from(decryptedSecret, 'base64').toString('utf-8')
     }
 }
 

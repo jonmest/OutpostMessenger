@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-
+import ContactListItem from './ContactListItem'
 const ContactList = ({ contacts }) => {
 
     /**
@@ -27,24 +27,7 @@ const ContactList = ({ contacts }) => {
                 {
                     contacts.map(item => {
                         return (
-                            <div className="card">
-                                <div className="card-content">
-                                    <p className="title">
-                                        { item.id }
-                                    </p>
-                                </div>
-                                <Link to={`/contact/${item.id}`}>
-                                    <footer className="card-footer">
-                                        <p className="card-footer-item">
-                                            <span>
-                                                <button className="button is-primary is-fullwidth">
-                                                    Decrypt & Open Conversation
-                                                </button>
-                                            </span>
-                                        </p>
-                                    </footer>
-                                </Link>
-                            </div>
+                            <ContactListItem contact={item}/>
                         )
                     })
                             }

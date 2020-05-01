@@ -154,56 +154,95 @@ Establish a socket connection between central server and client frontend.
 Emit and receive messages from socket connection.
 
 ## CF-5: Design a better socket connection architecture
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 7 | Intercommunication |
+
 Now, a user enters a chat room with another contact, which establishes a socketio connection and renders incoming messages. However, ALL messages received are rendered.
 
 Also, they need to ENTER a chat room to receive the messages. They should receive the messages at all time even in the dashboard.
 
 Est. time: 8 hours
 
+## CF-6: Add alias to contact
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Waiting | 7 | UX |
+Contacts are now referred to by ID. Allow the option to add an alias to contact's, making it more user friendly.
+
+Est. time: 6 hours
+
+## CF-7: Display message timestamps in friendly format
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 7 | UX |
+Display/render message timestamps in an okay manner.
+
+Est. time: 5 hours
+Actual time: 6 hours
+
+Comment: Had to rearrange some part of the messaging protocol.
+
+
+## CF-8: Remove "Decrypt  & Open Conversation"-button
+Clean up the GUI by removing the button, which shows for each of the contacts now, and only make the contact ID clickable.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 8 | Interface |
+
+Est. time: 1 h
+Actual time: 2h
+
+Comment: Replaced button with last message in conversation, instead.
 ---
 
 # Misc
-## M-0: Weekly OWASP Top 10 Review & Code Review
-| Status      | Priority           | Type  |
-| ------------- |-------------| -----:|
-| Ongoing | 9 | Security |
-
-Even though we're developing a desktop app, it's built with web technologies. Logically, it should also then be exposed to the same security risks, at least to some extent. Because of this, we have to perform (at least) a weekly review where we go over the source code and architecture and critique it on basis of the OWASP Top 10. The OWASP Top 10 is a standard awareness document for developers and web application security. It represents a broad consensus about the most critical security risks to web applications.
-
-Suggested process:
-1. Go through every source directory, quickly get an understanding of that code's purpose.
-2. Compare it against the OWASP Top 10
-3. If you deem the directory susceptible to some risk, read OWASP's recommendations for mitigation.
-4. Implement eventual recommendations.
-
-As of now, we don't see the need to be terribly thorough. However, it's very important all components/directories get covered each week.
-
-Use: https://www.owasp.org/images/5/53/OWASP_Code_Review_Guide_v2.pdf
-as a guideline for documenting the review.
 
 ## M-1: Read "A Roadmap for Node.js Security" and reflect
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Ongoing | 7 | Security |
+| Done | 7 | Security |
 Read "A Roadmap for Node.js Security" at https://nodesecroadmap.fyi/ and reflect how that information applies to your project.
 
-# M-2: Weekly unit test review
+## M-2: Weekly unit test review
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
 | Ongoing | 7 | Reliability |
 Each week, go through unit tests for CICDB and SPB servers and make sure the coverage is sufficient. Sufficient, in this case, is that each function is tested at least once in a way it is supposed to work.
 
-# M-3: Build and package the Electron app for distribution
+## M-3: Build and package the Electron app for distribution
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
 | Done (needs repeating) | 7 | Delivery |
 We can now build and package the main application for distribution with the command `npm build`.
 
-# M-3: Specify and perform penetration test cases
-Specify and perform penetration test cases for the centralized server.
-
-- Test lab setup
-- Specification
-- Execution
+# M-4: Specify manual test cases
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Ongoing | 7 | Reliability |
+Specify manual test cases for test plan.
 
 Est. time: 8 h
+
+## M-5: Deploy live version of central server on outpostmessenger.com
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Ongoing | 7 | Reliability |
+Deploy server to production. Need to configure DNS and NGINX.
+
+Est. time: 8 h
+Actual: 10 h
+
+## M-6: Perform manual test cases
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Waiting | 7 | Reliability |
+
+Est. time: 5 h
+
+## M-6: Implement additional unit testing for new features
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Waiting | 7 | Reliability |
+
+Est. time: 5 h

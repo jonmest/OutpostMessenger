@@ -18,11 +18,113 @@ React has good support for automated testing in Jest. However, we will as of now
 ## The Socket/Express server
 Similarly to the CICDB server, we will perform unit and integration tests in Jest in the exact same way.
 
-# Penetration testing
-This will need further elaboration, however these are the initial test cases:
+# Manual Test Cases
+## TC111
+**Description:** When app is started for the first time, a registration view is displayed.
 
-- Alice, Bob and Eve connect to the socket server. Alice messages Bob. Eve should not receive any information of their communication.
+**Precondition:** The app userdata is nonexistent.
 
-- Eve has free access to the central server through which all messages pass. Even when she logs all messages, she can only get to know the sender and recipient, not the actual messages.
+### Test steps:
+1. Start application
 
-- Eve tries connecting to the Socket.io server, claiming to have Alice's ID in the hopes of posing as her. She should have the wrong private key and get rejected.
+### Expected outcome:
+The headline "Create your Outpost now" should be displayed, along with a random 8-word passphrase, a button to accept it, and another button to reject it.
+
+### Outcome:
+
+## TC112
+**Description:** When registrating an outpost, user can accept a passphrase.
+
+**Precondition:** The app userdata is nonexistent.
+
+### Test steps:
+1. Start application
+2. Click button "Yes, I'll memorize and use this passphrase."
+
+### Expected outcome:
+An outpost should be generated, and user gets automatically signed into dashboard.
+
+### Outcome:
+
+## TC113
+**Description:** When registrating an outpost, user can reject a passphrase.
+
+**Precondition:** The app userdata is nonexistent.
+
+### Test steps:
+1. Start application
+2. Click button "No, generate another one."
+
+### Expected outcome:
+Another passphrase should have replaced the existing one.
+
+### Outcome:
+
+## TC114
+**Description:** When restarting the app after registration, login view should be displayed.
+
+**Precondition:** An outpost has been registered in a previous session.
+
+### Test steps:
+1. Start application
+
+### Expected outcome:
+Login view should be displayed, with a headline of "Log in with your passphrase"
+
+### Outcome:
+
+## TC115
+**Description:** Entering correct passphrase logs you in.
+
+**Precondition:** An outpost has been registered in a previous session, and the passphrase has been saved for now.
+
+### Test steps:
+1. Start application
+2. Enter the stored passphrase in textarea.
+3. Click submit.
+
+### Expected outcome:
+User gets logged in and redirected to dashboard.
+
+### Outcome:
+
+## TC121
+**Description:** User can add contact
+
+**Precondition:** Two contacts have been created, and are logged in.
+
+### Test steps:
+1. In user 1 account, click "Add contact" in dashboard
+2. Enter user 2's id in textfield and press enter.
+
+### Expected outcome:
+A green success notification should be displayed below textfield.
+
+### Outcome:
+
+## TC122
+**Description:** User can accept contact request
+
+**Precondition:** Two contacts have been created, and are logged in. User 1 has sent request to user 2.
+
+### Test steps:
+1. A notification is displayed in dashboard for user 2, saying that user 1 wants to add them, user 2 clicks it.
+
+### Expected outcome:
+User 1 is now shown as a contact in user 2's dashboard.
+
+### Outcome:
+
+## TC131
+**Description:** User 1 can send message to user 2
+
+**Precondition:** Two contacts have been created, are logged in, and have each other added as contacts.
+
+### Test steps:
+1. User 1 opens Contact page for user 2.
+2. User 1 enters "Hello" in textarea and presses Enter.
+
+### Expected outcome:
+User 1 and user 2 see the message "Hello" appear in chat history.
+
+### Outcome:

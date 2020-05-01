@@ -48,15 +48,18 @@ module.exports = {
     getContacts: async (request, reply) => {
         // TODO: Parse to base64 and limit length? See unit tests
         const contactId = request.query.id
-        const contacts = (contactId === undefined) ?
-         await CICDB.loadContacts(request.app.locals.db) :
-         await CICDB.loadContact(
-            validateId(contactId),
-            request.app.locals.db)
-        
-        reply.send({
-            contacts
-        })
+
+        if (contactId === undefined) {
+            CICDB.loadContacts(request.app.locals.db)
+            .then(contacts => reply.send({ contacts }))
+            .catch(e => null)
+        } else {
+            CICDB.loadContact(
+                validateId(contactId),
+                request.app.locals.db
+            ).then(contacts => reply.send({ contacts }))
+            .catch(e => null)
+        }
     },
 
     postContacts: async (request, reply) => {
@@ -77,23 +80,36 @@ module.exports = {
 
     getMessages: async (request, reply) => {
         const senderId = validateId(request.query.id)
+        const limit = request.query.limit
+
         const messages = (senderId === undefined) ? await CICDB.loadAllMessages(request.app.locals.db) : await CICDB.loadMessages(senderId, request.app.locals.db)
+        
+        let toReturn
+        if (limit) {
+            toReturn = messages.slice(messages.length - limit, messages.length)
+        } else {
+            toReturn = messages
+        }
         reply.send({
-            messages
+            messages: toReturn
         })
     },
 
     postMessages: async (request, reply) => {
+        const payload = request.body
         const message = {}
-        message.sender = validateId(request.body.sender)
-        message.data = validateString(request.body.data)
-    
+        message.sender = validateId(payload.sender)
+        message.data = validateString(payload.data)
+        message.timestamp = validateString(payload.timestamp)
+        message.recipient = validateString(payload.recipient)
+        
         CICDB.saveMessage(message, request.app.locals.db)
         .then(resolve => {
             reply.send({
                 result: 'success'
             })})
         .catch(reject => {
+            console.log(reject)
             reply.send({
                 result: 'failure'
             })})
@@ -101,21 +117,28 @@ module.exports = {
     },
 
     postEncrypt: async (request, reply) => {
-        const recipient = (request.body.serverKey) ? 
-            { publicKey: request.body.serverKey } :
-            await CICDB.loadContact(
-                request.body.message.recipient,request.app.locals.db
-            )
-        const message = request.body.message
+        let recipient
+        let isSignature = false
 
-        if (typeof message !== 'string')  (
-            message.sender = await CICDB.loadClient(request.app.locals.db)
-        )
-    
+        if (request.body.serverKey) {
+            recipient = {}
+            recipient.id = 'Socket Server'
+            recipient.publicKey = request.body.serverKey
+            isSignature = true
+        } else {
+            recipient = await CICDB.loadContact(
+                request.body.recipient, request.app.locals.db
+            )
+        }
+
+        const { data, timestamp } = request.body
+
         const cipherMessage = await cryption.encryptMessage(
-            message,
+            data,
             recipient,
-            await message.sender || await await CICDB.loadClient(request.app.locals.db)
+            timestamp,
+            await CICDB.loadClient(request.app.locals.db),
+            isSignature
         )
     
         reply.send({
@@ -124,9 +147,8 @@ module.exports = {
     },
 
     postDecrypt: async (request, reply) => {
-        const message = JSON.parse(
-            JSON.parse(request.body.message).message
-        )
+        const message = request.body.message
+        
         const sender = await CICDB.loadContact(
             validateId(message.sender),
             request.app.locals.db)

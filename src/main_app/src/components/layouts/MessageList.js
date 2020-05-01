@@ -1,15 +1,18 @@
 import React, { Fragment } from 'react'
 import Message from './Message'
 
-const MessageList = ({ messages, contact }) => {
+const MessageList = ({ messages, contact, me }) => {
     return (
         <Fragment>                   
             {
-          messages.map((item, index) => {
+          messages.filter(item => item !== undefined).map((item, index) => {
             return <Message key={index}
-            plaintext={item.plaintext}
+            data={item.data}
             sender={item.sender}
-            contact={contact}/>
+            contact={contact}
+            timestamp={item.timestamp}
+            me={me}
+            />
           })
           }
         </Fragment> 

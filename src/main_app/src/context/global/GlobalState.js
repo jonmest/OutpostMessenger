@@ -43,7 +43,7 @@ const GlobalState = props => {
                 state.bearToken,
                 {
                   serverKey: data.publicKey,
-                  message: data.token
+                  data: data.token
                 }).then(data => JSON.parse(data.message))
 
               socket.emit('Authentication response', { 

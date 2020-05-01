@@ -1,6 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState, useRef }   from 'react';
 import GlobalContext from '../../context/global/GlobalContext'
-import Message from '../layouts/Message'
 import { post, get } from '../../util/request'
 import io from 'socket.io-client'
 import socketAuth from '../../util/socketAuth'
@@ -22,8 +21,7 @@ const Contact = props => {
   * fetch current contact information
   */
   const globalContext = useContext(GlobalContext)
-  const { previousMessages, contact, getContact } = globalContext
-
+  const { contact, getContact } = globalContext
   const messagesEndRef = useRef(null)
 
   const setupSocket = async url => {
@@ -34,7 +32,9 @@ const Contact = props => {
             data.forEach(item => handleMessage(item.message))
           })
 
-          socket.on('message', data => handleMessage(data))
+          socket.on('message', data => {
+            handleMessage(data)
+          })
       })
       resolve(socket)
     })
@@ -42,7 +42,7 @@ const Contact = props => {
   }
 
   useEffect(() => {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current.scrollIntoView()
     document.body.style.overflowY = 'hidden'
     if (socket) window.socketConn = socket
   })
@@ -53,48 +53,54 @@ const Contact = props => {
 
   useEffect(() => {
     globalContext.setTitle(contact.id)
-  }, [contact])
+  }, [contact, messages])
 
   useEffect(() => {
+    
     getContact(props.match.params.contact)
-
-    // Establish IO connection
-    setupSocket('https://outpostmessenger.com/')
 
     get(
       `http://localhost:5000/outpost/messages?id=${props.match.params.contact}`,
       globalContext.bearToken,
     )
-    .then(res => res.messages)
-    .then(messages => {
-      setMessages(msgs => msgs.concat(messages))
+    .then(data => {
+      setMessages(msgs => msgs.concat(data.messages))
     })
+
+    // Establish IO connection
+    setupSocket('https://outpostmessenger.com/')
 
     // eslint-disable-next-line
   }, [])
 
-  const handleMessage = async message => {    
-    const decrypted = await post(
+  
+  /**
+   * Handle INCOMING message
+   * - Decrypt it
+   * - Store to local message DB
+   * @param {string} message 
+   */
+  const handleMessage = async message => {
+    console.log(message)
+
+    post(
       'http://localhost:5000/outpost/decrypt',
       globalContext.bearToken,
       { message }
-    ).then(item => item.message)
-    
-    post(
-      'http://localhost:5000/outpost/messages',
-      globalContext.bearToken,
-      {
-        sender: decrypted.sender,
-        recipient: decrypted.recipient,
-        data: decrypted.message
-      }
-    )
+    ).then(decrypted => {
+      post(
+        'http://localhost:5000/outpost/messages',
+        globalContext.bearToken,
+        decrypted.message
+      )
+      return decrypted.message
+    })
+    .then(message => {
+      console.log(message)
+      setMessages(msgs => msgs.concat(message))
+    })
 
-    setMessages(msgs => msgs.concat({
-        sender: decrypted.sender,
-        recipient: decrypted.recipient,
-        plaintext: decrypted.message.plain
-    }))
+
   }
 
   /*
@@ -110,49 +116,42 @@ const Contact = props => {
     event.preventDefault()
     if (message.length < 1) return
 
-    post(
-      'http://localhost:5000/outpost/messages',
-      globalContext.bearToken,
-      {
-        sender: contact.id,
-        recipient: globalContext.client.id,
-        data: message
-      }
-    )
+    // For timestamping the message
+    const date = new Date()
+    const now = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.000`
 
-    const schema = {
-      message : {
-            recipient : contact.id,
-            message   : {
-                count : 1,
-                plain : message
-            }
-      }
+    const body = {
+      recipient: contact.id,
+      sender: globalContext.client.id,
+      data: message,
+      timestamp: now
     }
 
-    // Reset input field
+    // Clear message form
     setMessage('')
+
+    // Store to local message DB before encryption
+    post('http://localhost:5000/outpost/messages',
+      globalContext.bearToken,
+      body)
+    .catch(() => console.log('Failed to store message.'))
     
     /*
     * Encrypt message
     */
-    const response = await post(
-      'http://localhost:5000/outpost/encrypt',
+    post('http://localhost:5000/outpost/encrypt',
       globalContext.bearToken,
-      schema
-    )
+      body)
+    .then(data => data.message)
+    .then(data => {
+        /*
+        * Send message to socket server
+        */
+        socket.emit('message', data)
+    })
+    .catch(() => console.log('Failed to encrypt message.'))
 
-
-    setMessages(msgs => msgs.concat({
-      sender: globalContext.client.id,
-      recipient: contact.id,
-      plaintext: message
-    }))
-
-    /*
-    * Send message to socket server
-    */
-   socket.emit('message', JSON.stringify(response))
+    setMessages(msgs => msgs.concat(body))
   }
   
   const handleKeydown = event =>  {
@@ -172,7 +171,7 @@ const Contact = props => {
                       overflowX: 'hidden', overflowY: 'scroll'
                     }}>
           
-          <MessageList messages={messages} contact={contact}/>
+          <MessageList messages={messages} contact={contact} me={globalContext.client.id}/>
 
           <div ref={messagesEndRef} />
           </div>

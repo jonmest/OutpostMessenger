@@ -55,6 +55,6 @@ module.exports = {
 
     validateString: string => {
         if (typeof string !== 'string') throw new Error()
-        return xssFilters.uriInHTMLData(string)
+        return string
     }
 }

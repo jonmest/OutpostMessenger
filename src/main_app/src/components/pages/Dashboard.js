@@ -4,8 +4,9 @@ import GlobalContext from '../../context/global/GlobalContext'
 import CopyField from '../layouts/CopyField'
 import ContactList from '../layouts/ContactList'
 import ContactRequest from '../layouts/ContactRequest'
+import { post } from '../../util/request'
 
-const Dashboard = props => {
+const Dashboard = () => {
     const globalState = useContext(GlobalContext)
     const { socket } = globalState
     const [contactRequests, setContactRequests] = useState([])
@@ -16,29 +17,20 @@ const Dashboard = props => {
     }, [])
 
     useEffect(() => {
-        const body = JSON.stringify({
+        const body = {
             id: globalState.client.id,
             publicKey: globalState.client.publicKey
-          })
+        }
 
-        fetch(
-            'https://outpostmessenger.com/outposts', 
-            {
-            method: 'POST',
-            mode: 'cors',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            }),
-            body
-      })
-      .catch(error => console.log(error))
+        post('https://outpostmessenger.com/outposts', null, body)
+        .catch(error => console.log(error))
 
-      if (socket) {
-        socket.on('contactRequests', requests => {
-            console.log("You've got a contact request.")
-            setContactRequests(contactRequests =>  [...contactRequests, ...requests])
-        })
-      }
+        if (socket) {
+            socket.on('contactRequests', requests => {
+                console.log("You've got a contact request.")
+                setContactRequests(contactRequests =>  [...contactRequests, ...requests])
+            })
+        }
     })
  
     return (
