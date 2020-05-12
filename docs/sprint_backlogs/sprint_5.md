@@ -2,12 +2,11 @@
 ## CF-6: Add alias to contact
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 7 | UX |
+| Done | 7 | UX |
 Contacts are now referred to by ID. Allow the option to add an alias to contact's, making it more user friendly.
 
-Implementation thought: PATCH request to /contacts
-
 Est. time: 6 hours
+Actual time: 5 h
 
 ## CF-7: Display message timestamps in friendly format
 | Status      | Priority           | Type  |

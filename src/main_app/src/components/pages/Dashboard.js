@@ -5,16 +5,60 @@ import CopyField from '../layouts/CopyField'
 import ContactList from '../layouts/ContactList'
 import ContactRequest from '../layouts/ContactRequest'
 import { post } from '../../util/request'
+import io from 'socket.io-client'
+import socketAuth from '../../util/socketAuth'
 
 const Dashboard = () => {
     const globalState = useContext(GlobalContext)
-    const { socket } = globalState
+    const { contacts, loadContacts, client, bearToken } = globalState
     const [contactRequests, setContactRequests] = useState([])
+    const [socket, setSocket] = useState(null)
+
+    const setupSocket = async url => {
+        return new Promise((resolve, reject) => {
+          const socket = io(url)
+          socketAuth(socket, globalState, () => {  
+              socket.on('message', message => {
+                post(
+                    'http://localhost:5000/outpost/decrypt',
+                    bearToken,
+                    { message }
+                  ).then(decrypted => {
+                    post(
+                      'http://localhost:5000/outpost/messages',
+                      bearToken,
+                      decrypted.message
+                    )
+                  })
+              })
+          })
+          resolve(socket)
+        })
+        .then(data => setSocket(data))
+        .catch(e => console.log(e))
+    }
 
     useEffect(() => {
-        globalState.openSocket()
+        loadContacts()
+        setupSocket('https://outpostmessenger.com/')
         
+        const body = {
+            id: client.id,
+            publicKey: client.publicKey
+        }
+
+        post('https://outpostmessenger.com/outposts', null, body)
+        .catch(error => console.log(error))   
     }, [])
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('contactRequests', requests => {
+                setContactRequests(contactRequests =>  [...contactRequests, ...requests])
+        })}
+    }, [socket])
+
+
 
     useEffect(() => {
         const body = {
@@ -25,13 +69,8 @@ const Dashboard = () => {
         post('https://outpostmessenger.com/outposts', null, body)
         .catch(error => console.log(error))
 
-        if (socket) {
-            socket.on('contactRequests', requests => {
-                console.log("You've got a contact request.")
-                setContactRequests(contactRequests =>  [...contactRequests, ...requests])
-            })
-        }
-    })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [contacts])
  
     return (
             <Fragment>
@@ -58,7 +97,7 @@ const Dashboard = () => {
                                     </Link>
                                     <ul className="menu-list">
                                         {
-                                            contactRequests.map(item => <ContactRequest sender={item.senderId}/>)
+                                            contactRequests.map((item, index) => <ContactRequest key={index} sender={item.senderId}/>)
                                         }
                                     </ul>
                                 </aside>

@@ -5,6 +5,14 @@ import io from 'socket.io-client'
 import socketAuth from '../../util/socketAuth'
 import MessageList from '../layouts/MessageList'
 
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGrinAlt } from '@fortawesome/free-solid-svg-icons'
+
+import "emoji-mart/css/emoji-mart.css"
+import { Picker } from "emoji-mart"
+
+
 const Contact = props => {
 
   /*
@@ -15,13 +23,17 @@ const Contact = props => {
  const [message, setMessage] = useState('')
  const [messages, setMessages] = useState([])
  const [socket, setSocket] = useState(null)
+ const [contact, setContact] = useState({})
+
+
+ // Emoji
+ const [emojiPickerShow, SetEmojiPickerShow] = useState(false)
 
   /*
   * Define global context and on mount
   * fetch current contact information
   */
   const globalContext = useContext(GlobalContext)
-  const { contact, getContact } = globalContext
   const messagesEndRef = useRef(null)
 
   const setupSocket = async url => {
@@ -41,23 +53,45 @@ const Contact = props => {
     .then(data => setSocket(data))
   }
 
+  /**
+   * On EACH re-render
+   */
   useEffect(() => {
     messagesEndRef.current.scrollIntoView()
     document.body.style.overflowY = 'hidden'
     if (socket) window.socketConn = socket
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   })
 
+  /**
+   * On UNMOUNT
+   */
   useEffect(() => {
-    return () => window.socketConn.close()
+    return () => {
+      window.socketConn.close()
+      window.removeEventListener("click", closeEmoji)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /**
+   * On update of contact
+   */
   useEffect(() => {
-    globalContext.setTitle(contact.id)
-  }, [contact, messages])
+    globalContext.setTitle(contactToString(contact))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contact])
 
+  /**
+   * On MOUNT
+   */
   useEffect(() => {
-    
-    getContact(props.match.params.contact)
+    get(`http://localhost:5000/outpost/contacts?id=${props.match.params.contact}`,
+    globalContext.bearToken)
+    .then(res => res.contacts)
+    .then(res => {
+      setContact(res)
+    })
 
     get(
       `http://localhost:5000/outpost/messages?id=${props.match.params.contact}`,
@@ -70,9 +104,20 @@ const Contact = props => {
     // Establish IO connection
     setupSocket('https://outpostmessenger.com/')
 
+
+
+    window.addEventListener('click', closeEmoji)
+
     // eslint-disable-next-line
   }, [])
 
+  const closeEmoji = e => {
+    e.preventDefault()
+    if (!e.target.closest(".emojiOpener")) {
+      SetEmojiPickerShow(false)
+    }
+
+  }
   
   /**
    * Handle INCOMING message
@@ -81,8 +126,6 @@ const Contact = props => {
    * @param {string} message 
    */
   const handleMessage = async message => {
-    console.log(message)
-
     post(
       'http://localhost:5000/outpost/decrypt',
       globalContext.bearToken,
@@ -96,7 +139,6 @@ const Contact = props => {
       return decrypted.message
     })
     .then(message => {
-      console.log(message)
       setMessages(msgs => msgs.concat(message))
     })
 
@@ -118,7 +160,7 @@ const Contact = props => {
 
     // For timestamping the message
     const date = new Date()
-    const now = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.000`
+    const now = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.000`
 
     const body = {
       recipient: contact.id,
@@ -142,7 +184,7 @@ const Contact = props => {
     post('http://localhost:5000/outpost/encrypt',
       globalContext.bearToken,
       body)
-    .then(data => data.message)
+    .then(data => JSON.parse(data.message))
     .then(data => {
         /*
         * Send message to socket server
@@ -161,39 +203,66 @@ const Contact = props => {
   }
 }
 
+const toggleEmojiPickerOn = e => {
+  e.preventDefault()
+  SetEmojiPickerShow(true)
+  e.stopPropagation()
+}
+
   return (
     <Fragment>
       <div style={{ height: '90vh', overflowY: 'hidden'}}>
 
-                    <div>
-                    <div className="container" style={{
-                      height: '70vh',
-                      overflowX: 'hidden', overflowY: 'scroll'
-                    }}>
-          
-          <MessageList messages={messages} contact={contact} me={globalContext.client.id}/>
-
-          <div ref={messagesEndRef} />
+        <div>
+          <div style={{
+            padding: '0 10px',
+            height: '80vh',
+            overflowX: 'hidden', overflowY: 'scroll'
+            }}>
+            <MessageList messages={messages} contact={contact} me={globalContext.client.id}/>
+            <div ref={messagesEndRef} />
           </div>
-                    </div>
+        </div>
 
                     <div style={{ 
-                      height: '25%', width: '100%',
+                      height: '10vh', width: '100%',
                       bottom: '0%',
                       padding: '0 10px'
                       }}>
               <form onSubmit={handleSubmit} onKeyDown={handleKeydown}>
                 
                 
-          <textarea autofocus="true" onChange={handleMessageChange} value={message} className="textarea" rows="3" placeholder="Write here..."/>
 
+<div className="control has-icons-left">
+          <textarea autoFocus={true} onChange={handleMessageChange} value={message} className="textarea" rows="3" placeholder="Write here..."/>
+        
+          </div>
 
+          <div className="emojiOpener" className="control">
+          <button className="emojiOpener" className="button is-light" onClick={toggleEmojiPickerOn}>
+          <FontAwesomeIcon className="emojiOpener" icon={faGrinAlt} />
+          </button>
+          </div>
+                      { emojiPickerShow && <Picker
+      id="emojiPicker"
+      style={{ position: 'absolute', bottom: '20px', right: '20px' }}
+        title="Pick your emoji…"
+        emoji="point_up"
+        set='twitter'
+        onSelect={emoji => setMessage(message + emoji.native)}
+        showSkinTones={false}
+
+      />}
           </form>
                     </div>
                   </div>
                 </Fragment> )
 }
 
-
+function contactToString (contact) {
+  if (!contact) return null
+  if (contact.alias) return contact.alias
+  else return contact.id
+}
 
 export default Contact

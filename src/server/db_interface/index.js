@@ -92,7 +92,7 @@ module.exports = {
             db.run(
                 `
                 DELETE FROM connected
-                WHERE id = $id;
+                WHERE outpostId = $id;
                 `, {
                 $id: id
             }, (error, success) => {

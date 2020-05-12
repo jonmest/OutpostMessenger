@@ -15,6 +15,7 @@ const Home = props => {
     .then(data => {
       if (data.result === 'true') setOutpostExists(true)
     })
+    .catch(() => console.log("Something... failed?"))
 
   }
   useEffect(() => {

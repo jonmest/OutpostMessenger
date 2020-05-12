@@ -26,11 +26,11 @@ const CopyField = ({ content, type, placeholder }) => {
 
     const renderTextArea = () => <textarea onClick={clickField} value={content}
         className={hasCopied ? 'textarea has-fixed-size is-primary' : 'textarea has-fixed-size' }
-        readonly rows="3" placeholder={placeholder}></textarea>
+        readOnly rows="3" placeholder={placeholder}></textarea>
 
     const renderInputField = () => <input
         onClick={clickField} className="input"
-        type="text" value={ content } readonly />
+        type="text" value={ content } readOnly />
 
     const renderTypeOfField = () => {
         if (type === 'textarea') return renderTextArea()

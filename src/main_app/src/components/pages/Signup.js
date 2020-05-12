@@ -59,6 +59,7 @@ const Signup = props => {
     passphrase.map(item => {
       toReturn += item
       toReturn += ' '
+      return null
     })
     return toReturn.slice(0, toReturn.length-1)
   }

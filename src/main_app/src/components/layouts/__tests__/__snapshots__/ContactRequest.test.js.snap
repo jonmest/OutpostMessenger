@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Matches snapshot 1`] = `
+<div
+  className="columns"
+>
+  <div
+    className="column"
+  />
+  <div
+    className="column"
+  >
+    <span
+      className="help has-text-grey-light"
+    >
+      <time
+        dateTime={"2020-05-12T11:38:32.000Z"}
+      >
+        a few seconds ago
+      </time>
+    </span>
+    <article
+      className="message "
+    >
+      <div
+        className="message-body"
+      >
+        <p>
+          This is a message.
+        </p>
+      </div>
+    </article>
+  </div>
+</div>
+`;

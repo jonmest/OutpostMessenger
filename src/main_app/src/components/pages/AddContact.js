@@ -1,8 +1,9 @@
-import React, { Fragment, useContext, useState }   from 'react'
+import React, { Fragment, useContext, useState, useEffect }   from 'react'
 import GlobalContext from '../../context/global/GlobalContext'
 import Notification from '../layouts/Notification'
 import { getContact, setContact } from '../../util/addContact'
-
+import io from 'socket.io-client'
+import socketAuth from '../../util/socketAuth'
 const AddContact = props => {
 
     /*
@@ -11,6 +12,23 @@ const AddContact = props => {
   const globalState = useContext(GlobalContext)
   const [id, setId] = useState("")
   const [notification, setNotification] = useState(null)
+  const [socket, setSocket] = useState(null)
+
+  const setupSocket = async url => {
+    return new Promise((resolve, reject) => {
+      const socket = io(url)
+      socketAuth(socket, globalState, () => {
+          console.log("Ready")
+      })
+      resolve(socket)
+    })
+    .then(data => setSocket(data))
+  }
+
+  useEffect(() => {
+      // Establish IO connection
+    setupSocket('https://outpostmessenger.com/')
+  }, [])
 
   /*
   * Eventhandler for submission
@@ -20,10 +38,9 @@ const AddContact = props => {
       // Fetch contacts
       const contact = await getContact(id)
 
-      if (globalState.socket) {
+      if (socket) {
         console.log("SOCKET")
-        console.log(contact)
-        globalState.socket.emit('contactRequest', { id: globalState.client.id, recipientId: contact.id })
+        socket.emit('contactRequest', { id: globalState.client.id, recipientId: contact.id })
       }
 
       setContact(contact, globalState.bearToken)

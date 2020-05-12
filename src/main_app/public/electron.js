@@ -4,6 +4,7 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require("path");
 const isDev = require("electron-is-dev");
 const { exec } = require('child_process');
+const { session } = require('electron')
 
 const CICDB_PORT = 5000
 
@@ -17,19 +18,19 @@ function createWindow() {
         icon: ""
     })
 
-    
-
-    mainWindow.setTitle('Outpost')
-    mainWindow.toggleDevTools()
-
+    mainWindow.setTitle('Outpost Messenger')
+    mainWindow.maximize()
     mainWindow.loadURL(
         isDev
         ? "http://localhost:3000"
         : `file://${path.join(__dirname, "../build/index.html")}`
-    );
+    )
     mainWindow.on("closed", () => {
       app.quit()
     });
+
+
+    mainWindow.show()
 }
 
 function createServerWindow (port) {
@@ -59,6 +60,11 @@ function createServerWindow (port) {
 app.on("ready", () => {
   createServerWindow(5000)
   createWindow()
+
+
+
+
+  
 });
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {

@@ -2,7 +2,7 @@ import {
     AUTH_SUCCESS,
     AUTH_FAIL,
     GET_CONTACT,
-    CLEAR_CONTACT,
+    LOAD_CONTACTS,
     ADD_CONTACT,
     SET_TITLE,
     SET_SOCKET
@@ -18,7 +18,7 @@ export default (state, action) => {
         case ADD_CONTACT:
             return {
                 ...state,
-                contacts: action.payload
+                contacts: state.contacts.concat(action.payload)
             }
         case SET_TITLE:
             return {
@@ -30,7 +30,6 @@ export default (state, action) => {
                 ...state,
                 bearToken: action.payload.bearToken,
                 client: action.payload.client,
-                contacts: action.payload.contacts,
                 isAuthenticated: true
             };
         case AUTH_FAIL:
@@ -43,6 +42,11 @@ export default (state, action) => {
                 ...state,
                 contact: action.payload.contact,
                 previousMessages: action.payload.previousMessages
+            }
+        case LOAD_CONTACTS:
+            return {
+                ...state,
+                contacts: action.payload
             }
         default:
             return state;

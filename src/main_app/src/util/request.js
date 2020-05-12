@@ -34,6 +34,48 @@ const post = async (url, token, bodyObject) => {
     })
 }
 
+const patch = async (url, token, bodyObject) => {
+    const options = {
+        method: 'PATCH',
+        mode: 'cors',
+        headers: new Headers({
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(bodyObject)
+        }
+
+    return fetch(
+        url, 
+        options
+        )
+    .then(res => res.json())
+    .catch(error => {
+        console.log('Failed to post.')
+    })
+}
+
+const deleteRequest = async (url, token, bodyObject) => {
+    const options = {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: new Headers({
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(bodyObject)
+        }
+
+    return fetch(
+        url, 
+        options
+        )
+    .then(res => res.json())
+    .catch(error => {
+        console.log('Failed to post.')
+    })
+}
+
 /**
  * Get resource
  * (tailored to CICDB API)
@@ -57,4 +99,4 @@ const get = async (url, token) => {
     })
 }
 
-export { post, get }
+export { post, get, patch, deleteRequest }

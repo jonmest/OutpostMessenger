@@ -4,13 +4,12 @@ import GlobalReducer from './GlobalReducer'
 import {
     AUTH_FAIL,
     AUTH_SUCCESS,
-    GET_CONTACT,
     CLEAR_CONTACT,
     SET_TITLE,
     ADD_CONTACT,
-    SET_SOCKET
+    SET_SOCKET,
+    LOAD_CONTACTS
 } from '../types'
-import axios from 'axios'
 import io from 'socket.io-client'
 import { post } from '../../util/request'
 
@@ -19,7 +18,7 @@ const GlobalState = props => {
     const initialState = {
         isAuthenticated: false,
         socket: null,
-        contacts: null,
+        contacts: [],
         contact: {},
         client: null,
         bearToken: null,
@@ -53,6 +52,20 @@ const GlobalState = props => {
               })
               console.log('Sent response.')
 
+              socket.on('message', message => {
+                post(
+                    'http://localhost:5000/outpost/decrypt',
+                    state.bearToken,
+                    { message }
+                  ).then(decrypted => {
+                    post(
+                      'http://localhost:5000/outpost/messages',
+                      state.bearToken,
+                      decrypted.message
+                    )
+                  })
+              })
+
               socket.on('Authentication success', data => {
                 dispatch({
                     type: SET_SOCKET,
@@ -60,6 +73,7 @@ const GlobalState = props => {
                 })
                 resolve(true)
               })
+
             })
           })
     }
@@ -71,43 +85,61 @@ const GlobalState = props => {
         })
     }
 
-    const authenticate = async (password) => {
-        try {
-            const res = await axios.post(
-              "http://localhost:5000/open/login",
-              { passphrase: password },
-            )
-    
-            if (res.data.result === 'failure') {
-                throw new Error()
-            }
-
-            const contacts = await fetch('http://localhost:5000/outpost/contacts', {
+    const loadContacts = token => {
+        fetch('http://localhost:5000/outpost/contacts', {
                 mode: 'cors',
                 headers: new Headers({
-                'Authorization': await res.data.Authorization
-                })
-            })
-            const json = await contacts.json()
-
-              dispatch({
-                type: AUTH_SUCCESS,
-                payload: { 
-                    bearToken: await res.data.Authorization,
-                    client: await res.data.client,
-                    contacts: await json.contacts     
-                }
-            })
-            
-            return 'SUCCESS'
-
-        } catch (e) {
+                'Authorization': (token) ? token : state.bearToken
+            })})
+        .then(data => data.json())
+        .then(data => data.contacts)
+        .then(contacts => {
             dispatch({
-                type: AUTH_FAIL,
-                payload: null
+                type: LOAD_CONTACTS,
+                payload: contacts
             })
-            return 'FAIL'
-        }
+        })
+    }
+
+    const authenticate = (password) => {
+        return new Promise((resolve, reject) => {
+            try {
+                fetch(
+                  "http://localhost:5000/open/login",
+                  {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    }),
+                    body: JSON.stringify({ passphrase: password })
+                    })
+                .catch(e => console.log('Moving on.'))
+                .then(res => res.json())
+                .then(res => {
+                    if (res.result === 'failure') reject()
+                    
+                    dispatch({
+                        type: AUTH_SUCCESS,
+                        payload: { 
+                            bearToken: res.Authorization,
+                            client: res.client,
+                        }
+                    })
+                    return res.Authorization
+                })
+                .then(token => {
+                    loadContacts(token)
+                })
+                .then(() => resolve('SUCCESS'))
+            } catch (e) {
+                dispatch({
+                    type: AUTH_FAIL,
+                    payload: null
+                })
+                resolve('FAIL')
+            }
+        })
     }
 
     const clearContact = () => {
@@ -120,43 +152,43 @@ const GlobalState = props => {
     const addContact = async contact =>  {
         dispatch({
             type: ADD_CONTACT,
-            payload: state.contacts.concat(contact)
+            payload: contact
         })
     }
 
-    const getContact = async (id) => {
-        const contact = await fetch(
-            `http://localhost:5000/outpost/contacts?id=${id}`, 
-                {
-                  method: 'GET',
-                  mode: 'cors',
-                  headers: new Headers({
-                  'Authorization': state.bearToken,
-                  'Content-Type': 'application/json'
-                  })
-            })
-        const contactObj = await contact.json()
+    // const getContact = async (id) => {
+    //     const contact = await fetch(
+    //         `http://localhost:5000/outpost/contacts?id=${id}`, 
+    //             {
+    //               method: 'GET',
+    //               mode: 'cors',
+    //               headers: new Headers({
+    //               'Authorization': state.bearToken,
+    //               'Content-Type': 'application/json'
+    //               })
+    //         })
+    //     const contactObj = await contact.json()
 
-        const messages = await fetch(
-            `http://localhost:5000/outpost/messages?id=${id}`, 
-                {
-                  method: 'GET',
-                  mode: 'cors',
-                  headers: new Headers({
-                  'Authorization': state.bearToken,
-                  'Content-Type': 'application/json'
-                  })
-            })
-        const messagesObj = await messages.json()
+    //     const messages = await fetch(
+    //         `http://localhost:5000/outpost/messages?id=${id}`, 
+    //             {
+    //               method: 'GET',
+    //               mode: 'cors',
+    //               headers: new Headers({
+    //               'Authorization': state.bearToken,
+    //               'Content-Type': 'application/json'
+    //               })
+    //         })
+    //     const messagesObj = await messages.json()
 
-        dispatch({
-            type: GET_CONTACT,
-            payload:  {
-                contact: contactObj.contacts,
-                previousMessages: messagesObj.messages
-            }
-        })
-    }
+    //     dispatch({
+    //         type: GET_CONTACT,
+    //         payload:  {
+    //             contact: contactObj.contacts,
+    //             previousMessages: messagesObj.messages
+    //         }
+    //     })
+    // }
 
     return <GlobalContext.Provider
     value={{
@@ -167,7 +199,8 @@ const GlobalState = props => {
         contact: state.contact,
         previousMessages: state.previousMessages,
         authenticate,
-        getContact,
+        // getContact,
+        loadContacts,
         clearContact,
         setTitle,
         addContact,

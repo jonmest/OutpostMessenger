@@ -82,7 +82,7 @@ We should be able to store a clients keys in an encrypted format in the DB, alon
 ### SPB-0: Register an outpost
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| In progress | 9 | Functional |
+| Done | 9 | Functional |
 
 When a client has generated their OutPost, they shall immediately send their credentials (ID and public keys) to the server. If the ID already exists, it's rejected. Otherwise, it's stored in the database.
 
@@ -118,12 +118,12 @@ A client should be able to send an encrypted message over a websocket connection
 
 Corresponding to CIC-0. Log in.
 
-## CF-1: Implement graphical interface for adding contacts it ID or QR-code
+## CF-1: Implement graphical interface for adding contacts it ID
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| In process (awaiting dependency) | 8 | Interface |
+| Done | 8 | Interface |
 Dependent on SPB-0 and SPB-1.
-Corresponding to CIC-07. Also, QR code should be able to be read and decoded on the frontend and send to a uniform endpoint in the API,
+Corresponding to CIC-07.
 
 ## CF-1: Implement front-end message encryption/decryption  
 | Status      | Priority           | Type  |
@@ -167,10 +167,11 @@ Est. time: 8 hours
 ## CF-6: Add alias to contact
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 7 | UX |
+| Done | 7 | UX |
 Contacts are now referred to by ID. Allow the option to add an alias to contact's, making it more user friendly.
 
 Est. time: 6 hours
+Actual time: 5 h
 
 ## CF-7: Display message timestamps in friendly format
 | Status      | Priority           | Type  |
@@ -194,6 +195,15 @@ Est. time: 1 h
 Actual time: 2h
 
 Comment: Replaced button with last message in conversation, instead.
+
+## CF-9: Add option to delete contact
+Allow users to delete contacts.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Waiting | 8 | Interface |
+
+Est. time: 1 h
+
 ---
 
 # Misc
@@ -227,7 +237,7 @@ Est. time: 8 h
 ## M-5: Deploy live version of central server on outpostmessenger.com
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Ongoing | 7 | Reliability |
+| Done | 7 | Reliability |
 Deploy server to production. Need to configure DNS and NGINX.
 
 Est. time: 8 h

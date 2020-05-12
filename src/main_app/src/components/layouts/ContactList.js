@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import { Link } from 'react-router-dom'
 import ContactListItem from './ContactListItem'
 const ContactList = ({ contacts }) => {
 
@@ -25,9 +24,9 @@ const ContactList = ({ contacts }) => {
         } else {
             return <Fragment>
                 {
-                    contacts.map(item => {
+                    contacts.map((item, index) => {
                         return (
-                            <ContactListItem contact={item}/>
+                            <ContactListItem key={index} contact={item}/>
                         )
                     })
                             }

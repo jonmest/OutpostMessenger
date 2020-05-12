@@ -4,7 +4,7 @@ const niceware = require('niceware')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
-const { validatePassphrase, validateId, validatePBK, validateString } = require('../validation')
+const { validatePassphrase } = require('../validation')
 
 const outpostPath = `${process.env.USER_DATA_PATH}/.outpost` 
 

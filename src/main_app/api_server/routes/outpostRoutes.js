@@ -24,12 +24,12 @@ const router = express.Router()
 * Controllers
 */
 const { postClient, getContacts, postContacts, getMessages,
-        postMessages, postEncrypt, postDecrypt } =
+        postMessages, postEncrypt, postDecrypt, patchContacts, deleteContacts } =
         require('../controllers/outpostRoutes')
 
 /**
- * Fetch client object from database
- * GET /client
+ * Set client object to database
+ * POST /client
  */
 router.post('/client', postClient)
 
@@ -46,6 +46,16 @@ router.get('/contacts', getContacts)
  * Add a contact, post a contact object
  */
 router.post('/contacts', postContacts)
+
+/**
+ * Update contact
+ */
+router.patch('/contacts', patchContacts)
+
+/**
+ * Delete contact
+ */
+router.delete('/contacts', deleteContacts)
 
 /**
  * GET /messages

@@ -24,6 +24,7 @@ const createClient = (client, db) => {
             db.run(
                 `CREATE TABLE contacts (
                     id TEXT,
+                    alias TEXT,
                     publicKey TEXT
                     );`
                 , (error, success) => {
@@ -83,8 +84,6 @@ const loadClient = async (db) => {
     })
 }
 
-
-
 const saveContact = async (contact, db) => {
     return new Promise((resolve, reject) => {
 
@@ -106,12 +105,48 @@ const saveContact = async (contact, db) => {
     })
 }
 
+const patchContactAlias = async (id, alias, db) => {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(
+                `UPDATE contacts
+                SET
+                    alias = $alias
+                WHERE
+                    id = $id;`, {
+                $alias: alias,
+                $id: id
+                }, (error, success) => {
+                    if (error) reject()
+                    resolve()
+                })
+        })
+    })
+}
+
+const deleteContact = async (id, db) => {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(
+                `DELETE FROM contacts
+                WHERE
+                    id = $id;`, {
+                $id: id
+                }, (error, success) => {
+                    if (error) reject()
+                    resolve()
+                })
+        })
+    })
+}
+
 const loadContact = async (contactId, db) => {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
 
             db.get(`SELECT DISTINCT
                         id,
+                        alias,
                         publicKey
                     FROM 
                         contacts
@@ -127,7 +162,8 @@ const loadContact = async (contactId, db) => {
                         }
                         resolve({
                             id: row.id,
-                            publicKey: row.publicKey
+                            publicKey: row.publicKey,
+                            alias: row.alias
                         })
             })
         })
@@ -141,6 +177,7 @@ const loadContacts = async (db) => {
 
             db.all(`SELECT DISTINCT
                         id,
+                        alias,
                         publicKey
                     FROM 
                         contacts;
@@ -235,6 +272,8 @@ module.exports = {
     saveContact,
     loadContact,
     loadContacts,
+    deleteContact,
+    patchContactAlias,
 
     saveMessage,
     loadMessages,

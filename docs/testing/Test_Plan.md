@@ -128,3 +128,20 @@ User 1 is now shown as a contact in user 2's dashboard.
 User 1 and user 2 see the message "Hello" appear in chat history.
 
 ### Outcome:
+
+
+## TC141
+**Description:** User 1 can change alias for user 2
+
+**Precondition:** Two contacts have been created, are logged in, and have each other added as contacts.
+
+### Test steps:
+1. User 1 opens Dashboard page.
+2. User 1 locates listing for user 2.
+3. User 1 clicks on cog icon in listing.
+4. User 1 enters "Nick" in alias text field and clicks submit button
+
+### Expected outcome:
+Listing for contact should now be referring to "Nick".
+
+### Outcome:

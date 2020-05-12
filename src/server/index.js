@@ -94,7 +94,7 @@ const socketAuthentication = (socket, db, next) => {
         const supposedClient = await getOutpost(id, db)
 
         console.log('Someone wants to connect.')
-        console.log(signedToken)
+        console.log(id)
 
         // We'll try to decrypt the token they sent back
         const authenticatedToken = nacl.box.open(
@@ -120,10 +120,11 @@ const socketAuthentication = (socket, db, next) => {
             ) {
             socket.emit('Authentication success')
             setConnected(socket.conn.id, id, db)
-            .then(data => console.log(data))
+            .then(data => console.log('Set connected'))
 
 
             const waitingMessages = await getMessages(id, db)
+                                    .then(data => data.map(msg => JSON.parse(msg)))
             ioSocket.to(socket.conn.id).emit('oldMessages', waitingMessages)
 
             // Call callback function
@@ -142,7 +143,7 @@ ioSocket.on('connection', socket => {
         getContactRequests(id, db)
         .then(requests => {
             if (requests.length > 0) {
-                socket.emit('contactRequests', requests)
+                ioSocket.to(socket.conn.id).emit('contactRequests', requests)
             }
         })
 
@@ -166,9 +167,11 @@ ioSocket.on('connection', socket => {
         })
         
         socket.on('disconnect', () => {
-            removeConnected(socketId, db)
+            removeConnected(id, db)
             .then(success => {
-                if (success) console.log(success)
+                if (success) console.log('Removed connected')
+                getConnected(id, db)
+                .then(result => console.log(result))
             })
             console.log('Dropped')
         })

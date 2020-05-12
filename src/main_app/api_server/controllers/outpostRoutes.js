@@ -78,6 +78,27 @@ module.exports = {
             })})
     },
 
+    patchContacts: async (request, reply) => {
+        // Now, we'll only implement ability
+        // To add alias to contact
+        const id = request.body.id
+        const alias = request.body.alias
+        CICDB.patchContactAlias(id, alias, request.app.locals.db)
+        .then(() => {
+            reply.send({ result: 'success' })
+        })
+        .catch(() => reply.send({ result: 'failure' }))
+    },
+
+    deleteContacts: async (request, reply) => {
+        const id = request.body.id
+        CICDB.deleteContact(id, request.app.locals.db)
+        .then(() => {
+            reply.send({ result: 'success' })
+        })
+        .catch(() => reply.send({ result: 'failure' }))
+    },
+
     getMessages: async (request, reply) => {
         const senderId = validateId(request.query.id)
         const limit = request.query.limit
@@ -109,7 +130,6 @@ module.exports = {
                 result: 'success'
             })})
         .catch(reject => {
-            console.log(reject)
             reply.send({
                 result: 'failure'
             })})
