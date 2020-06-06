@@ -17,20 +17,26 @@ const Dashboard = () => {
     const setupSocket = async url => {
         return new Promise((resolve, reject) => {
           const socket = io(url)
-          socketAuth(socket, globalState, () => {  
+          console.log("Trying to connect...")
+          socketAuth(socket, globalState, () => {
+              console.log("Connected...")
               socket.on('message', message => {
                 post(
-                    'http://localhost:5000/outpost/decrypt',
+                    `http://localhost:5000/outpost/decrypt`,
                     bearToken,
                     { message }
                   ).then(decrypted => {
                     post(
-                      'http://localhost:5000/outpost/messages',
+                    `http://localhost:5000/outpost/messages`,
                       bearToken,
                       decrypted.message
                     )
                   })
               })
+
+              socket.on('contactRequests', requests => {
+                setContactRequests(contactRequests =>  [...contactRequests, ...requests])
+            })
           })
           resolve(socket)
         })
@@ -39,8 +45,7 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        loadContacts()
-        setupSocket('https://outpostmessenger.com/')
+        loadContacts()        
         
         const body = {
             id: client.id,
@@ -48,17 +53,19 @@ const Dashboard = () => {
         }
 
         post('https://outpostmessenger.com/outposts', null, body)
+        .then(() => {
+            setupSocket('https://outpostmessenger.com/')
+        })
         .catch(error => console.log(error))   
     }, [])
 
     useEffect(() => {
-        if (socket) {
-            socket.on('contactRequests', requests => {
-                setContactRequests(contactRequests =>  [...contactRequests, ...requests])
-        })}
-    }, [socket])
-
-
+        return () => {
+            if (socket) {
+                socket.close()
+            }
+        }
+    })
 
     useEffect(() => {
         const body = {

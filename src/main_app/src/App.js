@@ -14,29 +14,11 @@ import Navbar from './components/layouts/Navbar'
  */
 import GlobalState from './context/global/GlobalState'
 
+// Query parameter should look like:
+// ?port=5000
+window.cicdbPort = window.location.search.slice(6) // For just number
+
 const App = () => {
-  // const [outpostExists, setOutpostExists] = useState(false)
-  // const checkIfOutpostExists = () => {
-  //   fetch(
-  //     'http://localhost:5000/open/exists-client', 
-  //     {
-  //         method: 'GET',
-  //         mode: 'cors',
-  //         headers: new Headers({
-  //             'Content-Type': 'application/json'
-  //     })
-  // })
-  // .then(res => res.json())
-  //   .then(data => {
-  //     if (data.result === 'true') setOutpostExists(true)
-  //   })
-
-  // }
-  // useEffect(() => {
-  //   checkIfOutpostExists()
-  //   // eslint-disable-next-line
-  // }, [])
-
 
     return (
       <GlobalState>

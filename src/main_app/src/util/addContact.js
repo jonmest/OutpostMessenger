@@ -15,7 +15,7 @@ const getContact = async id => {
 }
 
 const setContact = async (contact, myToken) => {
-    post('http://localhost:5000/outpost/contacts',
+    post(`http://localhost:${window.cicdbPort}/outpost/contacts`,
         myToken,
         contact
     ).then(data => {

@@ -11,7 +11,7 @@ Surprisingly, the implementation of encryption is often done poorly. The world's
 There are other technology companies that aim to serve individuals and businesses interested in better privacy by providing end-to-end encryption (E2EE). E2EE can be described as a more rigorous form of encryption where a message stays encrypted until its passed on to the indented recipient, who then decrypts it.
 
 ## The Solution
-Our vision is to create an end-to-end encrypted text messaging desktop application for all people who wish to send messages only the intended recipients can read. We will refrain from calling it *secure*, however, the goal is to keep the sent data safe from most unauthorized parties, even the peeking eyes of ours, the owners of the centralized server through which all communication occurs.
+Our vision is to create an end-to-end encrypted text messaging desktop application for all Linux users who wish to send messages only the intended recipients can read. We will refrain from calling it *secure*, however, the goal is to keep the sent data safe from most unauthorized parties, even the peeking eyes of ours, the owners of the centralized server through which all communication occurs.
 
 Cryptography engineering is hard, because of which we refrain from calling the envisioned application "secure". However, we want to follow some cryptography engineering best practices, in the hopes of creating an MVP we can further build upon in the future.
 

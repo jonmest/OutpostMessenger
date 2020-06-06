@@ -23,7 +23,7 @@ const ContactListItem = ({ contact }) => {
     
 
     const reFetch = () => {
-        get(`http://localhost:5000/outpost/contacts?id=${contact.id}`,
+        get(`http://localhost:${window.cicdbPort}/outpost/contacts?id=${contact.id}`,
             globalContext.bearToken)
         .then(res => res.contacts)
         .then(res => {
@@ -34,7 +34,7 @@ const ContactListItem = ({ contact }) => {
     useEffect(() => {
         setContactState(contact)
 
-        get(`http://localhost:5000/outpost/messages?id=${contact.id}&limit=1`,
+        get(`http://localhost:${window.cicdbPort}/outpost/messages?id=${contact.id}&limit=1`,
         globalContext.bearToken)
         .then(response => response.messages)
         .then(list => setlastMessage(list[0]))
@@ -72,7 +72,7 @@ const ContactListItem = ({ contact }) => {
     const handleAliasSubmit = event => {
         event.preventDefault()
 
-        patch('http://localhost:5000/outpost/contacts',
+        patch(`http://localhost:${window.cicdbPort}/outpost/contacts`,
             globalContext.bearToken,
             { id: contact.id, alias })
         .then(res => console.log(res))
@@ -93,7 +93,7 @@ const ContactListItem = ({ contact }) => {
 
     const confirmDelete = event => {
         event.preventDefault()
-        deleteRequest('http://localhost:5000/outpost/contacts',
+        deleteRequest(`http://localhost:${window.cicdbPort}/outpost/contacts`,
         globalContext.bearToken,
         { id: contact.id, alias })
         .then(() => loadContacts())
@@ -111,7 +111,7 @@ const ContactListItem = ({ contact }) => {
                         </p>
                             <div style={{overflow: 'visible'}} class={ showMenu ? 'dropdown is-active is-right' : 'dropdown is-right'}>
                             <div class="dropdown-trigger">
-                                <button onClick={toggleMenu} class="button card-header-icon" aria-haspopup="true" aria-controls="dropdown-menu2">
+                                <button onClick={toggleMenu} class="button  is-dark is-inverted" style={{height: '100%'}} aria-haspopup="true" aria-controls="dropdown-menu2">
                                 <span class="icon is-small">
                                     <FontAwesomeIcon icon={faUser} />
                                 </span>

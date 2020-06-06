@@ -25,6 +25,7 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.19.2",
     "bulma": "^0.8.1",
+    "bulma-pageloader": "^0.3.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "cross-env": "^6.0.3",
@@ -40,6 +41,7 @@
     "mui-layout": "^1.2.9",
     "node-sass": "^4.13.1",
     "portastic": "^1.0.1",
+    "portfinder": "^1.0.26",
     "react": "^16.13.1",
     "react-bulma-components": "^3.2.0",
     "react-dom": "^16.11.0",
@@ -52,7 +54,6 @@
     "xss-filters": "^1.2.7"
   },
   "scripts": {
-    "start-api": "npm run --s start --prefix ./api_server/ $*",
     "test": "jest -u",
     "start-react": "react-scripts start",
     "build-react": "react-scripts build",

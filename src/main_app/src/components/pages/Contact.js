@@ -5,7 +5,6 @@ import io from 'socket.io-client'
 import socketAuth from '../../util/socketAuth'
 import MessageList from '../layouts/MessageList'
 
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGrinAlt } from '@fortawesome/free-solid-svg-icons'
 
@@ -86,7 +85,7 @@ const Contact = props => {
    * On MOUNT
    */
   useEffect(() => {
-    get(`http://localhost:5000/outpost/contacts?id=${props.match.params.contact}`,
+    get(`http://localhost:${window.cicdbPort}/outpost/contacts?id=${props.match.params.contact}`,
     globalContext.bearToken)
     .then(res => res.contacts)
     .then(res => {
@@ -94,7 +93,7 @@ const Contact = props => {
     })
 
     get(
-      `http://localhost:5000/outpost/messages?id=${props.match.params.contact}`,
+      `http://localhost:${window.cicdbPort}/outpost/messages?id=${props.match.params.contact}`,
       globalContext.bearToken,
     )
     .then(data => {
@@ -103,7 +102,6 @@ const Contact = props => {
 
     // Establish IO connection
     setupSocket('https://outpostmessenger.com/')
-
 
 
     window.addEventListener('click', closeEmoji)
@@ -127,12 +125,12 @@ const Contact = props => {
    */
   const handleMessage = async message => {
     post(
-      'http://localhost:5000/outpost/decrypt',
+      `http://localhost:${window.cicdbPort}/outpost/decrypt`,
       globalContext.bearToken,
       { message }
     ).then(decrypted => {
       post(
-        'http://localhost:5000/outpost/messages',
+        `http://localhost:${window.cicdbPort}/outpost/messages`,
         globalContext.bearToken,
         decrypted.message
       )
@@ -173,7 +171,7 @@ const Contact = props => {
     setMessage('')
 
     // Store to local message DB before encryption
-    post('http://localhost:5000/outpost/messages',
+    post(`http://localhost:${window.cicdbPort}/outpost/messages`,
       globalContext.bearToken,
       body)
     .catch(() => console.log('Failed to store message.'))
@@ -181,7 +179,7 @@ const Contact = props => {
     /*
     * Encrypt message
     */
-    post('http://localhost:5000/outpost/encrypt',
+    post(`http://localhost:${window.cicdbPort}/outpost/encrypt`,
       globalContext.bearToken,
       body)
     .then(data => JSON.parse(data.message))
@@ -219,8 +217,18 @@ const toggleEmojiPickerOn = e => {
             height: '80vh',
             overflowX: 'hidden', overflowY: 'scroll'
             }}>
+
+<div class="columns" style={{maxWidth: '100%'}}>
+  <div className="column">
+    
+  </div>
+  <div class="column is-three-quarters">
             <MessageList messages={messages} contact={contact} me={globalContext.client.id}/>
             <div ref={messagesEndRef} />
+</div>
+<div className="column">
+  </div>
+            </div>
           </div>
         </div>
 
@@ -231,18 +239,31 @@ const toggleEmojiPickerOn = e => {
                       }}>
               <form onSubmit={handleSubmit} onKeyDown={handleKeydown}>
                 
-                
 
-<div className="control has-icons-left">
+
+<div class="columns" style={{maxWidth: '100%'}}>
+  <div className="column">
+
+  </div>
+  <div class="column is-three-quarters">
+  <div className="control">
           <textarea autoFocus={true} onChange={handleMessageChange} value={message} className="textarea" rows="3" placeholder="Write here..."/>
         
           </div>
-
-          <div className="emojiOpener" className="control">
+  </div>
+  <div class="column">
+  <div className="emojiOpener" className="control">
           <button className="emojiOpener" className="button is-light" onClick={toggleEmojiPickerOn}>
           <FontAwesomeIcon className="emojiOpener" icon={faGrinAlt} />
           </button>
           </div>
+  </div>
+
+</div>
+                
+              
+
+
                       { emojiPickerShow && <Picker
       id="emojiPicker"
       style={{ position: 'absolute', bottom: '20px', right: '20px' }}

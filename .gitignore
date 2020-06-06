@@ -1,9 +1,9 @@
 /src/node_modules/
 /src/main_app/node_modules/
-/src/main_app/.vscode/
-/src/server/.vscode/
 /src/server/node_modules/
 /src/main_app/api_server/test.db
 /src/main_app/api_server/.outpost
 /.vscode/
 /src/main_app/api_server/node_modules/
+./test.db
+/src/server/public/

@@ -8,18 +8,20 @@ module.exports = (port, callback) => {
 
   server.locals.accessTokenSecret = require('crypto').randomBytes(18).toString('base64')
 
-
-  /**
-  * DB
-  */
-
-  const dbPath = `${process.env.USER_DATA_PATH}/outpost.db` 
-  var sqlite3 = require('@journeyapps/sqlcipher').verbose()
-  const db = new sqlite3.Database(dbPath)
-  // ↓↓↓ Very important, routes won't work without this
-  server.locals.db = db
-  // ↑↑↑
-
+  try {
+    /**
+    * DB
+      */
+    const path = require('path')
+    const dbPath = path.resolve(process.env.USER_DATA_PATH, 'outpost.db')
+    var sqlite3 = require('@journeyapps/sqlcipher').verbose()
+    const db = new sqlite3.Database(dbPath)
+    // ↓↓↓ Very important, routes won't work without this
+    server.locals.db = db
+    // ↑↑↑
+  } catch (e) {
+    console.log(e)
+  }
   /**
    * Misc. middleware
    */
@@ -37,7 +39,12 @@ module.exports = (port, callback) => {
   /**
    * Listen to port argument
    */
-  server.listen(port, 'localhost')
+  if (process.env.NODE_ENV !== 'test') {
+    server.listen(port, 'localhost')
+  }
+  
   
   callback()
+
+  return server
 }

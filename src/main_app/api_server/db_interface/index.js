@@ -25,7 +25,8 @@ const createClient = (client, db) => {
                 `CREATE TABLE contacts (
                     id TEXT,
                     alias TEXT,
-                    publicKey TEXT
+                    publicKey TEXT,
+                    lastSeen TEXT
                     );`
                 , (error, success) => {
                     if (error) reject('Already exists')
@@ -147,7 +148,8 @@ const loadContact = async (contactId, db) => {
             db.get(`SELECT DISTINCT
                         id,
                         alias,
-                        publicKey
+                        publicKey,
+                        lastSeen
                     FROM 
                         contacts
                     WHERE
@@ -163,12 +165,13 @@ const loadContact = async (contactId, db) => {
                         resolve({
                             id: row.id,
                             publicKey: row.publicKey,
-                            alias: row.alias
+                            alias: row.alias,
+                            lastSeen: row.lastSeen
                         })
             })
         })
     })
-    .catch(reason => console.log("F"))
+    .catch(() => console.log("Failed to load contact"))
 }
 
 const loadContacts = async (db) => {
@@ -184,18 +187,16 @@ const loadContacts = async (db) => {
                     `,
                     async (error, rows) => {
                         if (error) reject(error)
-                        console.log(rows)
                         resolve(rows)
             })
         })
     })
+    .catch(() => console.log("Failed to load contacts"))
 }
 
 
 const saveMessage = async (message, db) => {
     return new Promise((resolve, reject) => {
-        console.log(`Saving message from ${message.sender}`)
-        console.log(message)
         db.serialize(() => {
             /**
              * Insert data into client table
@@ -219,14 +220,26 @@ const saveMessage = async (message, db) => {
                     $timestamp: message.timestamp
                 }, (error, success) => {
                     if (error) console.log(error)
-                    resolve()
                 })
+
+            db.run(
+                `UPDATE contacts
+                SET lastSeen = $lastSeen
+                WHERE id = $sender OR id = $recipient;
+                `, { 
+                    $lastSeen: message.timestamp,
+                    $sender: message.sender,
+                    $recipient: message.recipient
+                }, (error, success) => {
+                    resolve()
+                }
+            )
         })
     })
+    .catch(() => console.log("Failed to save message."))
 }
 const loadMessages = async (id, db) => {
     return new Promise((resolve, reject) => {
-        console.log(`Loading messages from ${id}`)
         db.serialize(() => {
             db.all(`SELECT *
                     FROM 
@@ -236,8 +249,6 @@ const loadMessages = async (id, db) => {
                     `,
                     { $id: id },
                     (error, rows) => {
-                        console.log('This is what we found...')
-                        console.log(rows)
                         if (error) console.log(error)
                         resolve(rows)
             })

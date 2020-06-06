@@ -8,14 +8,21 @@ import { get } from '../../util/request'
 const Home = props => {
   const globalState = useContext(GlobalContext)
   const [outpostExists, setOutpostExists] = useState(false)
+  const [hasReceivedResponse, setHasReceivedResponse] = useState(false)
   const { isAuthenticated } = globalState
 
   const checkIfOutpostExists = () => {
-    get('http://localhost:5000/open/exists-client', null)
+    get(`http://localhost:${window.cicdbPort}/open/exists-client`, null)
     .then(data => {
       if (data.result === 'true') setOutpostExists(true)
+      else setOutpostExists(false)
+      setHasReceivedResponse(true)
     })
-    .catch(() => console.log("Something... failed?"))
+    .catch(() => {
+      setTimeout(() => {
+        checkIfOutpostExists()
+      }, 1000)
+    })
 
   }
   useEffect(() => {
@@ -28,9 +35,28 @@ const Home = props => {
       {
                     isAuthenticated ?
                       <Dashboard/> :
-                      outpostExists ?
-                        <Login {...props}/> :
-                        <Signup {...props}/>      
+                      hasReceivedResponse ?
+                      <Fragment>
+                        {
+                        outpostExists ?
+                          <Login {...props}/> :
+                          <Signup {...props}/> 
+                        }
+                      </Fragment> :
+                      <Fragment>
+
+                        <section className="hero is-primary is-bold is-fullheight">
+                          <div className="hero-body">
+                            <div className="container">
+                            <div className="loader has-text-centered is-loading" style={{ fontSize: '80px', color: 'red', margin: 'auto'}}></div>
+
+                            </div>
+                          </div>
+                        </section>
+                        
+                          
+
+                      </Fragment>
       }
       </Fragment>
     )

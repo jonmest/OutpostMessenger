@@ -33,9 +33,10 @@ Comment: Replaced button with last message in conversation, instead.
 ## M-6: Perform manual test cases
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 7 | Reliability |
+| Done | 7 | Reliability |
 
 Est. time: 5 h
+actual: 5
 
 ## M-6: Implement additional unit testing for new features
 | Status      | Priority           | Type  |
@@ -43,3 +44,13 @@ Est. time: 5 h
 | Waiting | 7 | Reliability |
 
 Est. time: 5 h
+Actual. 5 h
+
+## CF-9: Add option to delete contact
+Allow users to delete contacts.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 8 | Interface |
+
+Est. time: 1 h
+Actual: 2

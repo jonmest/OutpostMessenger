@@ -23,7 +23,7 @@ const Signup = props => {
    * Fetch random passphrase
    */
   const fetchPassphrase = () => {
-    get('http://localhost:5000/open/passphrase-generate')
+    get(`http://localhost:${window.cicdbPort}/open/passphrase-generate`)
     .then(data => setPassphrase(data.passphrase))
     .catch(error => console.log(error))
   }
@@ -35,7 +35,7 @@ const Signup = props => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     post(
-      'http://localhost:5000/open/create-client',
+      `http://localhost:${window.cicdbPort}/open/create-client`,
       null,
       { passphrase } )
     .then(data => {

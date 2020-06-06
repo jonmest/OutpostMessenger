@@ -24,7 +24,9 @@ const ContactList = ({ contacts }) => {
         } else {
             return <Fragment>
                 {
-                    contacts.map((item, index) => {
+                    contacts.sort((a, b) => {
+                        return new Date(b.date) - new Date(a.date)
+                    }).map((item, index) => {
                         return (
                             <ContactListItem key={index} contact={item}/>
                         )

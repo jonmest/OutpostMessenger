@@ -1,7 +1,6 @@
 const cryption = require('../crypto/cryption')
 const nacl = require('tweetnacl')
-
-let sender, keyPair1, recipient, keypair2, plainMessage
+let sender, keyPair1, recipient, keypair2, plainMessage, isSignature
 
 beforeEach(() => {
     keyPair1 = nacl.box.keyPair()
@@ -21,36 +20,41 @@ beforeEach(() => {
     plainMessage = {
         'recipient' : recipient.id,
         'sender'    : sender.id,
-
-        'message'   : {
-            'count' : 1, // Start count at 1, always increase
-            'plain' : "Hey Tom, it's Erik!"
-        }
+        'timestamp': '2020-5-15 9:14:4.000',
+        'data'   : "Hey Tom, it's Erik!"
     }
 
+    isSignature = false
   })
 
 
 test('Can encrypt message', async () => {    
     const cipherMessage = await cryption.encryptMessage(
-        plainMessage,
+        plainMessage.data,
         recipient,
-        sender
+        plainMessage.timestamp,
+        sender,
+        isSignature
     )
     const messageObj = JSON.parse(cipherMessage)
 
     expect(typeof cipherMessage).toBe('string')
+    expect(Object.keys(messageObj)).toContain('timestamp')
     expect(Object.keys(messageObj)).toContain('recipient')
     expect(Object.keys(messageObj)).toContain('nonce')
     expect(Object.keys(messageObj)).toContain('secret')
-    expect(Object.keys(messageObj).length).toBe(4)
+    // Expect keys to be:
+    // Recipient, sender, timestamp, nonce, secret
+    expect(Object.keys(messageObj).length).toBe(5)
 })
 
 test('Can correctly decrypt message', async () => {    
     const cipherMessage = await cryption.encryptMessage(
-        plainMessage,
+        plainMessage.data,
         recipient,
-        sender
+        plainMessage.timestamp,
+        sender,
+        isSignature
     )
     
     const plaintext = await cryption.decryptMessage(
@@ -61,14 +65,12 @@ test('Can correctly decrypt message', async () => {
 
     expect(Object.keys(plaintext)).toContain('recipient')
     expect(Object.keys(plaintext)).toContain('sender')
-    expect(Object.keys(plaintext)).toContain('message')
-
-    expect(Object.keys(plaintext.message)).toContain('count')
-    expect(Object.keys(plaintext.message)).toContain('plain')
+    expect(Object.keys(plaintext)).toContain('data')
+    expect(Object.keys(plaintext)).toContain('timestamp')
 
     expect(plaintext.sender).toBe("ERIK")
     expect(plaintext.recipient).toBe("TOM")
-    expect(plaintext.message.count).toBe(1)
-    expect(plaintext.message.plain).toBe("Hey Tom, it's Erik!")
+    expect(plaintext.timestamp).toBe('2020-5-15 9:14:4.000')
+    expect(plaintext.data).toBe("Hey Tom, it's Erik!")
 
 })

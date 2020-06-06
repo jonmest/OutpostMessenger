@@ -200,10 +200,59 @@ Comment: Replaced button with last message in conversation, instead.
 Allow users to delete contacts.
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 8 | Interface |
+| Done | 8 | Interface |
 
 Est. time: 1 h
+Actual: 2
 
+## CF-10: Add masking to login form
+Allow users to delete contacts.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 5 | Interface |
+
+When users login, the passphrase input form should be masked by default, however the user should be able to read input in plaintext upon the click of a toggle button.
+
+Expected: 5 h
+Actual: 4 h
+
+## CF-11: Add emoji capabilities
+Allow users to delete contacts.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 6 | Messaging |
+
+Allow users to select emojis and append them to text messages.
+
+## CF-12: Add Markdown capabilities
+Allow users to use markdown when writing messages.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 6 | Messaging |
+
+Allow users to use markdown when writing messages like in Discord.
+https://gist.github.com/Almeeida/41a664d8d5f3a8855591c2f1e0e07b19
+https://github.com/rexxars/react-markdown
+
+## CF-13: Make messages stack straight on top of eachother
+Allow users to delete contacts.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 5 | Interface |
+
+And instead differentiate between client and contact by color-coding.
+
+## CF-14: Sort contact list by recency of last message 
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 5 | UX |
+
+## CF-15: Implement loading bar on startup
+Sometimes the loading of a client's information can take a while on startup. Ensure the application will show a loading spinner when loading it, and if there's  an error, try again ad infinitum.
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 5 | UX |
 ---
 
 # Misc
@@ -229,7 +278,7 @@ We can now build and package the main application for distribution with the comm
 # M-4: Specify manual test cases
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Ongoing | 7 | Reliability |
+| Done | 7 | Reliability |
 Specify manual test cases for test plan.
 
 Est. time: 8 h
@@ -246,13 +295,81 @@ Actual: 10 h
 ## M-6: Perform manual test cases
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 7 | Reliability |
+| Done | 7 | Reliability |
 
-Est. time: 5 h
 
-## M-6: Implement additional unit testing for new features
+## M-6: Implement additional unit testing for new features in React
 | Status      | Priority           | Type  |
 | ------------- |-------------| -----:|
-| Waiting | 7 | Reliability |
+| In progress | 7 | Reliability |
+
+
+## M-7: Build static security analysis tool for Electron applications
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 7 | Security |
+
+Automatically find some antipatterns specific to Electron applications.
+
+Est. time: 15 h
+Actual time: 12 h
+
+
+## M-8: Finish "Download" website
+Finish basic website where people can download the application from.
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 7 | Misc. |
 
 Est. time: 5 h
+Actual time: 6 h
+
+## M-9: Find out how to include api-server executables in distribution
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Distribution |
+
+## M-10: Build application for Linux and open for distribution
+Build and publish on outpostmessenger.com
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Distribution |
+
+## M-11: Create installation script
+Users need to conveniently download and install the application. Create a bash script that handles it for them.
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Distribution |
+
+## M-12: Initiate QA
+Pack the application for distribution, and perform QA on that product. IE, make sure all user stories are working like they should, and all manual tests pass.
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Distribution |
+
+## M-13: Make port choice flexible
+As of now, the applications port is hardcoded which makes it fragile when distributing among different users and systems. Make the application automatically select a free port.
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Distribution |
+
+## M-14: Finish documentation
+There's a need to finish and edit the documentation (test plan, project vision, product backlog). We also need to create documentation for potential users who would like to download and use the application.
+
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Documentation |
+
+## M-15: Write a Post Mortem
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Documentation |
+
+## M-16: Create a demonstration video
+| Status      | Priority           | Type  |
+| ------------- |-------------| -----:|
+| Done | 9 | Documentation |

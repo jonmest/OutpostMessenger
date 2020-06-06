@@ -38,25 +38,32 @@ const AddContact = props => {
       // Fetch contacts
       const contact = await getContact(id)
 
-      if (socket) {
-        console.log("SOCKET")
+      if (socket && contact) {
         socket.emit('contactRequest', { id: globalState.client.id, recipientId: contact.id })
       }
 
-      setContact(contact, globalState.bearToken)
-      .then(() => {
-        globalState.addContact(contact)
+      if (contact) {
+        setContact(contact, globalState.bearToken)
+        .then(() => {
+          globalState.addContact(contact)
+          setNotification({
+                  message: "Contact successfully added.",
+                  type: "is-success"
+              })
+        })
+        .catch(() => {
+          setNotification({
+              message: 'User ID was not found. Try to enter the ID again.',
+              type: 'is-danger'
+          })
+        })
+      } else {
         setNotification({
-                message: "Contact successfully added.",
-                type: "is-success"
-            })
-      })
-      .catch(() => {
-        setNotification({
-            message: 'Something failed.',
+            message: 'User ID was not found. Try to enter the ID again.',
             type: 'is-danger'
         })
-      })
+      }
+      
 
     }          
 

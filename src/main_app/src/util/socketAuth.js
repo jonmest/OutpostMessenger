@@ -2,8 +2,9 @@ import { post } from './request'
 
 const socketAuth = (socket, context, onAuthenticated) => {
     socket.on('Authentication request', async data => {
+        console.log("Received authentication request.")
         post(
-          'http://localhost:5000/outpost/encrypt',
+          `http://localhost:${window.cicdbPort}/outpost/encrypt`,
           context.bearToken,
           {
             serverKey: data.publicKey,

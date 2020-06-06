@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = async (request, reply, next) => {
-    const token = request.headers.authorization.split(' ')[1]
+    let token
+
     try {
+      token = request.headers.authorization.split(' ')[1]
       if (!token) {
         return reply.status(401).json('You need to login')
       }
@@ -13,6 +15,6 @@ module.exports = async (request, reply, next) => {
       }
       next()
     } catch (err) {
-      return reply.status(500)
+      return reply.status(401).json('You need to login')
     }
 }

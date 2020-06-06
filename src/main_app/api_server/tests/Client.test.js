@@ -40,7 +40,7 @@ test('no matter what, ID and asymmetric keypair is random even with same passphr
 test('that ID length is correct', async () => {
     client = await Client.create('TESTPHRASE')
     expect(client.id.length).toBe(16) // String length base64
-    expect(Buffer.from(client.id, 'hex').length).toBe(18) //bytes
+    expect(Buffer.from(client.id, 'hex').length).toBe(8) //bytes
 })
 
 test('that master key length is correct', async () => {

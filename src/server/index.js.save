@@ -75,6 +75,7 @@ app.get('/public/css/stack-interface.css', (req, res) => {
     res.sendFile(index);
 })
 
+app.get('
 
 app.get('/public/img/outpost.png', (req, res) => {
     const index = path.join(__dirname, 'public', 'img/outpost.png');
@@ -88,21 +89,6 @@ app.get('/public/css/bootstrap.css', (req, res) => {
 
 app.get('/public/css/iconsmind.css', (req, res) => {
     const index = path.join(__dirname, 'public', 'css/iconsmind.css');
-    res.sendFile(index);
-})
-
-app.get('/download-linux', (req, res) => {
-	const index = path.join(__dirname, 'public', 'outpost.tar.gz');
-	res.sendFile(index);
-})
-
-app.get('/fed-installer', (req, res) => {
-        const index = path.join(__dirname, 'public', 'fed-install.sh');
-        res.sendFile(index);
-})
-
-app.get('/deb-installer', (req, res) => {
-    const index = path.join(__dirname, 'public', 'deb-install.sh');
     res.sendFile(index);
 })
 
@@ -136,9 +122,7 @@ const socketAuthentication = (socket, db, next) => {
     * them the data needed for them and us to
     * verify their identity
     */
-    const requester = setInterval(() => {
-        socket.emit('Authentication request', authRequestObject)
-    }, 2000)
+    socket.emit('Authentication request', authRequestObject)
 
     /*
     * When client responds to request.
@@ -176,27 +160,23 @@ const socketAuthentication = (socket, db, next) => {
             authenticatedToken.toString('base64') === token.toString('base64') ||
             authenticatedToken === null
             ) {
-                socket.emit('Authentication success')
-                clearInterval(requester)
-                setConnected(socket.conn.id, id, db)
-                .then(data => console.log('Set connected'))
+            socket.emit('Authentication success')
+            setConnected(socket.conn.id, id, db)
+            .then(data => console.log('Set connected'))
 
 
-                const waitingMessages = await getMessages(id, db)
-                    .then(data => data.map(msg => JSON.parse(msg)))
-                    socket.emit('oldMessages', waitingMessages)
+            const waitingMessages = await getMessages(id, db)
+                                    .then(data => data.map(msg => JSON.parse(msg)))
+            ioSocket.to(socket.conn.id).emit('oldMessages', waitingMessages)
 
-                getContactRequests(id, db)
-                    .then(requests => {
-                        console.log(requests)
-                        if (requests.length > 0) {
-                            console.log("Sending contactRequests")
-                            socket.emit('contactRequests', requests)
-                        }
-                    })
-                    .catch(e => console.log("Failed to get contact requests"))
-                    // Call callback function
-                    next(id, socket.conn.id)
+		getContactRequests(id, db)
+        	.then(requests => {
+           		 if (requests.length > 0) {
+                	ioSocket.to(socket.conn.id).emit('contactRequests', requests)
+            	}
+        	})
+            // Call callback function
+            next(id, socket.conn.id)
         }    
     })
 }

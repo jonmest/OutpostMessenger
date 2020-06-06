@@ -74,7 +74,7 @@ module.exports = {
         const hash = crypto.createHash('sha256')
           .update(passphrase, 'utf-8')
           .digest('base64')
-        const success = await compareHash(outpostPath, hash)
+        const success = await compareHash(outpostPath, hash).catch(() => false)
 
         if (await success) {
             await request.app.locals.db.run(`PRAGMA key = '${passphrase}'`)

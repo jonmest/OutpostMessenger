@@ -27,8 +27,11 @@ const Login = props => {
         .then(res => {
           if (res === 'SUCCESS') {
             setHasFailed(false)
-            props.history.push('/')
+            // props.history.push('/')
           } else setHasFailed(true)
+        })
+        .catch(() => {
+          setHasFailed(true)
         })
     }
 
