@@ -17,7 +17,7 @@
   "author": "Jon Cavallie Mester",
   "license": "ISC",
   "devDependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "electron": "^8.5.2",
     "foreman": "^3.0.1",
     "jest": "^25.2.4",
