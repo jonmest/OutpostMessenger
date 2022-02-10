@@ -39,7 +39,7 @@
     "material-ui-icons": "^1.0.0-beta.36",
     "moment": "^2.24.0",
     "mui-layout": "^1.2.9",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "portastic": "^1.0.1",
     "portfinder": "^1.0.26",
     "react": "^16.13.1",
